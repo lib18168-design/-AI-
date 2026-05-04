@@ -1,0 +1,85 @@
+<div class="flex flex-col lg:flex-row gap-6">
+    <!-- 左侧配置区 -->
+    <div class="lg:w-1/2 space-y-5">
+        <!-- 上传卡片 -->
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <h3 class="font-semibold mb-3"><i class="fas fa-cloud-upload-alt text-blue-500"></i> 上传产品图片</h3>
+            <label id="uploadLabel" class="flex flex-col items-center border-2 border-dashed border-gray-300 rounded-lg py-8 cursor-pointer hover:bg-blue-50">
+                <i class="fas fa-image text-3xl text-gray-400 mb-2"></i>
+                <p class="text-sm">点击或拖拽图片至此</p>
+                <p class="text-xs text-gray-400">JPG/PNG/WebP，最多5张，单张≤10MB</p>
+                <input type="file" id="imageInput" accept="image/*" class="hidden" multiple>
+            </label>
+            <div id="previewContainer" class="mt-4 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto"></div>
+        </div>
+        <!-- 模型选择 -->
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <label class="font-semibold mb-2 block flex items-center gap-2"><i class="fas fa-microchip text-indigo-500"></i> 选择AI模型</label>
+            <select id="modelSelect" class="w-full p-2 border border-gray-200 rounded-lg bg-gray-50 text-sm">
+                <option value="gpt-5.4">GPT-5.4</option>
+            </select>
+            <p class="text-xs text-gray-400 mt-1">不同模型分析角度略有差异</p>
+        </div>
+        <!-- 分析指令 -->
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <label class="font-semibold mb-2 block"><i class="fas fa-cogs text-purple-500"></i> 分析指令</label>
+            <textarea id="promptInput" rows="6" class="w-full p-3 border rounded-lg text-sm bg-gray-50">你现在的身份是资深电商视觉总监和AI绘画提示词专家。请分析这张产品图，生成一段用于AI生图软件（即梦）的高质量中文提示词。
+
+生成逻辑：
+1. 识别产品：精准描述款式、颜色、材质、设计细节。
+2. 匹配模特：构思最合适的模特（性别、年龄、发型、妆容、姿态），必须强调“真人模特穿着”。
+3. 构建场景：设计符合产品调性的高级场景（街头、摄影棚、海边等）。
+4. 摄影质感：加入8k、全身照、景深、柔光、时尚杂志风等专业词汇。
+
+【重要输出约束】
+1. 直接输出一段连贯的中文描述，用逗号分隔。
+2. 绝对禁止输出“这张图是...”、“分析结果：”等任何废话。
+3. 只保留描述画面的词语，确保复制后能直接在即梦生成图片。</textarea>
+            <div class="flex justify-end gap-2 mt-2">
+                <button id="savePromptBtn" class="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded">保存为默认</button>
+                <button id="loadPromptBtn" class="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded">加载默认</button>
+            </div>
+        </div>
+        <!-- 按钮组 -->
+        <div class="flex gap-3">
+            <button id="analyzeBtn" class="flex-1 bg-blue-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-blue-700 transition flex justify-center items-center gap-2">
+                <span id="btnText">开始 AI 分析</span>
+                <div id="loader" class="loader hidden" style="width:20px;height:20px;border-width:2px;"></div>
+            </button>
+            <button id="cancelBtn" class="px-4 bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl shadow-md hover:bg-gray-300 transition disabled:opacity-50" disabled>取消</button>
+            <button id="exportBtn" class="px-4 bg-green-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-green-700 transition">导出报告</button>
+        </div>
+    </div>
+    <!-- 右侧结果区 -->
+    <div class="lg:w-1/2">
+        <div class="bg-white rounded-xl shadow-sm p-5 sticky top-24">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-semibold"><i class="fas fa-file-alt text-green-600"></i> 分析报告</h3>
+                <button id="copyReportBtn" class="text-sm text-gray-500 hover:text-blue-600"><i class="far fa-copy"></i> 复制</button>
+            </div>
+            <!-- 进度提示（初始隐藏） -->
+            <div id="progressIndicator" class="text-sm text-blue-600 mb-2 hidden"></div>
+            <!-- 默认状态（无结果时显示） -->
+            <div id="defaultState" class="text-center text-gray-400 py-12">
+                <i class="fas fa-robot text-4xl mb-2"></i><p>等待分析结果...</p>
+            </div>
+            <!-- 加载状态（分析中显示） -->
+            <div id="loadingState" class="hidden text-center text-blue-600 py-12">
+                <div class="loader mx-auto mb-2"></div><p>AI 正在分析...</p>
+            </div>
+            <!-- 动态结果卡片容器 -->
+            <div id="resultContainer" class="overflow-y-auto" style="max-height: 500px;"></div>
+            <!-- 历史记录区域 -->
+            <div class="mt-6 border-t pt-4">
+                <div class="flex justify-between items-center">
+                    <button id="toggleHistoryBtn" class="text-sm text-gray-500 flex items-center gap-1"><i class="fas fa-history"></i> 历史</button>
+                    <div class="flex gap-2">
+                        <button id="exportHistoryBtn" class="text-xs text-blue-500 hover:underline">导出历史</button>
+                        <button id="clearHistoryBtn" class="text-xs text-red-500 hover:underline">清空</button>
+                    </div>
+                </div>
+                <div id="historyPanel" class="hidden mt-2 max-h-60 overflow-y-auto text-sm space-y-2"></div>
+            </div>
+        </div>
+    </div>
+</div>

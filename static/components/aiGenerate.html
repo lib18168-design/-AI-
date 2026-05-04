@@ -1,0 +1,20 @@
+<div class="bg-white rounded-2xl shadow-md p-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">🎨 AI 生成产品图（本地 ComfyUI）</h2>
+    <p class="text-gray-500 mb-4">需要本地 ComfyUI 服务运行在 http://127.0.0.1:8188</p>
+
+    <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">图片描述 (Prompt)</label>
+        <textarea id="localImagePrompt" rows="6" class="w-full p-4 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-400" placeholder="例如：一款简约风格的白色陶瓷咖啡杯，带金色把手，纯白背景，产品摄影，8K"></textarea>
+    </div>
+
+    <button id="generateLocalImageBtn" class="w-full bg-blue-600 text-white font-medium py-3 rounded-xl hover:bg-blue-700 transition shadow-sm">生成本地图片</button>
+
+    <div id="localImageResultContainer" class="mt-6 hidden">
+        <img id="localGeneratedImage" class="w-full rounded-lg border" alt="生成的图片">
+        <button id="localDownloadImageBtn" class="mt-2 text-sm text-blue-600">下载图片</button>
+    </div>
+
+    <div class="mt-4 text-xs text-gray-400">
+        <p>💡 提示：请确保 ComfyUI 已启动，且工作流文件 workflow_api.json 存在于项目根目录。</p>
+    </div>
+</div>

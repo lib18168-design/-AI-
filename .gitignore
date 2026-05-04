@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+.env
+.venv
+*.egg-info/
+dist/
+build/
+
+# Flask
+instance/
+*.db
+*.sqlite
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# 项目特定（API 密钥配置、本地生成文件）
+config_local.py
+*.key
+*.secret
+*.pem
+workflow_api.json   # 如果你不再需要 ComfyUI，可忽略；如需保留则删除本行
+uploads/
+generated/
+static/covers/       # 风格图片可能会随项目分发，如果你不想上传图片，取消注释
+*.tmp
+*.bak

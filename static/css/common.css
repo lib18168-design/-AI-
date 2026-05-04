@@ -1,0 +1,61 @@
+/* ============================================
+   公共样式（仅保留功能必需部分）
+   视觉细节由 ui_enhance.css 接管
+   ============================================ */
+
+/* 加载动画（必需） */
+.loader {
+    border: 3px solid #e2e8f0;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 首页功能卡片交互（保留，不冲突） */
+.feature-card {
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1);
+}
+
+/* 上传区域拖拽高亮（保留） */
+.upload-highlight {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+/* 页面切换（必需） */
+.page.hidden {
+    display: none;
+}
+
+/* 历史记录列表项（保留原有样式，新 UI 未覆盖此区域） */
+.history-item {
+    padding: 8px;
+    border-left: 3px solid #3b82f6;
+    background: #f9fafb;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+.history-item:hover {
+    background: #f3f4f6;
+}
+.history-time {
+    font-size: 0.7rem;
+    color: #6b7280;
+}
+.history-preview {
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

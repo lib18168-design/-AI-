@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>半月明 · 电商视觉AI分析专家</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_enhance.css') }}">
+    <style>
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 14px; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        #toast.show { opacity: 1; }
+        button, .feature-card, .history-item, .upload-label, .delete-history-btn { touch-action: manipulation; cursor: pointer; }
+        button:active, .feature-card:active, .history-item:active { opacity: 0.7; transition: opacity 0.05s; }
+        button { min-height: 44px; }
+        .tab-btn.active { background-color: #3b82f6; color: white; }
+        .page { display: none; }
+        .page.active { display: block; }
+    </style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- ====== 新增移动端组件 ====== -->
+<div class="mobile-top lg:hidden">
+    <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="菜单">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="mobile-brand">
+        <div class="brand-mark">✨</div>
+        <span>半月明</span>
+    </div>
+    <div class="mobile-credit">
+        <span>AI</span><b>∞</b>
+    </div>
+</div>
+
+<aside id="mobileSidebar" class="sidebar mobile-sidebar">
+    <div class="brand">
+        <div class="brand-mark">半月明</div>
+        <div class="brand-text"><b>半月明</b><small>电商视觉AI</small></div>
+    </div>
+    <div class="side-nav">
+        <a href="#" class="nav-link" data-page="home">🏠 首页</a>
+        <a href="#" class="nav-link" data-page="imageAnalysis">📊 图片分析</a>
+        <a href="#" class="nav-link" data-page="videoPrompt">✨ AI文生图</a>
+        <a href="#" class="nav-link" data-page="visualParse">👁️ 视觉元素解析</a>
+        <a href="#" class="nav-link" data-page="aiGenerate">🎨 AI本地文生图</a>
+    </div>
+    <div class="sidebar-footer">
+        <div class="credit-card-mini">
+            <span>可用额度</span>
+            <b>不限次</b>
+            <small>当前模式: 云端</small>
+        </div>
+    </div>
+</aside>
+
+<div id="mobileDrawerOverlay" class="mobile-drawer-overlay"></div>
+<!-- ====== 新增结束 ====== -->
+<!-- 首页 -->
+<div id="homePage" class="page active">
+    <div class="bg-white shadow-sm border-b sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2"><i class="fas fa-chart-line text-blue-600 text-xl"></i><span class="font-bold text-gray-800">南秋北 · 电商视觉AI</span></div>
+            <div class="text-sm text-gray-500"><i class="fas fa-robot mr-1"></i> AI 驱动 · 视觉优化</div>
+        </div>
+    </div>
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 py-16 text-center"><h1 class="text-4xl font-extrabold">电商视觉<span class="text-blue-600">AI 分析专家</span></h1><p class="text-gray-500 mt-2">上传产品图片，AI 深度解析视觉元素</p></div>
+    <div class="max-w-7xl mx-auto px-4 py-16">
+        <div class="text-center mb-12"><h2 class="text-3xl font-bold">强大的 AI 视觉工具集</h2><p class="text-gray-500">为电商设计量身打造</p></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="feature-card bg-white rounded-2xl p-6 text-center shadow-sm" data-page="imageAnalysis"><div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4"><i class="fas fa-chart-line text-blue-600 text-xl"></i></div><h3 class="font-bold">图片分析</h3><p class="text-sm text-gray-500">识别卖点 · 优化视觉</p></div>
+            <div class="feature-card bg-white rounded-2xl p-6 text-center shadow-sm" data-page="videoPrompt"><div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4"><i class="fas fa-magic text-purple-600 text-xl"></i></div><h3 class="font-bold">AI 文生图</h3><p class="text-sm text-gray-500">视频提示词生成</p></div>
+            <div class="feature-card bg-white rounded-2xl p-6 text-center shadow-sm" data-page="visualParse"><div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4"><i class="fas fa-eye text-green-600 text-xl"></i></div><h3 class="font-bold">视觉元素解析</h3><p class="text-sm text-gray-500">构图 · 光影 · 色彩</p></div>
+            <div class="feature-card bg-white rounded-2xl p-6 text-center shadow-sm" data-page="aiGenerate"><div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-4"><i class="fas fa-image text-amber-600 text-xl"></i></div><h3 class="font-bold">AI 本地生图</h3><p class="text-sm text-gray-500">即将开放</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- 功能页面容器（动态加载内容） -->
+<div id="imageAnalysisPage" class="page"><div class="max-w-7xl mx-auto px-4 py-6"><button onclick="window.showPage('home')" class="mb-4 text-blue-600 hover:underline">← 返回首页</button><div id="imageAnalysisContainer"></div></div></div>
+<div id="videoPromptPage" class="page"><div class="max-w-5xl mx-auto px-4 py-6"><button onclick="window.showPage('home')" class="mb-4 text-blue-600 hover:underline">← 返回首页</button><div id="videoPromptContainer"></div></div></div>
+<div id="visualParsePage" class="page"><div class="max-w-4xl mx-auto px-4 py-6"><button onclick="window.showPage('home')" class="mb-4 text-blue-600 hover:underline">← 返回首页</button><div id="visualParseContainer"></div></div></div>
+<div id="aiGeneratePage" class="page"><div class="max-w-4xl mx-auto px-4 py-6"><button onclick="window.showPage('home')" class="mb-4 text-blue-600 hover:underline">← 返回首页</button><div id="aiGenerateContainer"></div></div></div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+<script src="{{ url_for('static', filename='js/imageAnalysis.js') }}"></script>
+<script src="{{ url_for('static', filename='js/videoPrompt.js') }}"></script>
+<script src="{{ url_for('static', filename='js/visualParse.js') }}"></script>
+<script src="{{ url_for('static', filename='js/aiGenerate.js') }}"></script>
+<script>
+    // 全局 showToast
+    if (typeof window.showToast !== 'function') {
+        window.showToast = function(msg) {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.innerText = msg;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            }
+        };
+    }
+
+    // 页面切换
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        if (pageId === 'home') {
+            document.getElementById('homePage').classList.add('active');
+        } else {
+            const targetPage = document.getElementById(pageId + 'Page');
+            if (targetPage) targetPage.classList.add('active');
+            loadComponentIfNeeded(pageId);
+        }
+    }
+
+    // 加载组件
+    async function loadComponentIfNeeded(componentName) {
+        const containerId = componentName + 'Container';
+        const container = document.getElementById(containerId);
+        if (!container || container.dataset.loaded === 'true') return;
+        try {
+            const url = `/static/components/${componentName}.html`;
+            const response = await fetch(url);
+            const html = await response.text();
+            container.innerHTML = html;
+            container.dataset.loaded = 'true';
+            const initFunc = window['init' + componentName.charAt(0).toUpperCase() + componentName.slice(1)];
+            if (typeof initFunc === 'function') initFunc();
+        } catch (err) {
+            console.error(`加载组件 ${componentName} 失败:`, err);
+            container.innerHTML = '<div class="text-red-500 text-center py-10">加载失败，请刷新重试</div>';
+        }
+    }
+
+    // 绑定卡片点击事件
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const page = card.getAttribute('data-page');
+            if (page) showPage(page);
+        });
+    });
+
+    if (typeof window.initHistory === 'function') window.initHistory();
+    showPage('home');
+</script>
+</body>

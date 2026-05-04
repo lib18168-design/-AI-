@@ -1,0 +1,177 @@
+<div class="flex flex-col lg:flex-row gap-8">
+    <!-- 左侧输入区 -->
+    <div class="lg:w-1/2">
+        <div class="bg-white rounded-2xl shadow-md p-6">
+            <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <i class="fas fa-magic text-pink-600"></i>
+                AI 文生图提示词生成器
+            </h3>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    描述你想要生成的图片
+                </label>
+                <textarea id="imageDescription" rows="6"
+                    class="w-full p-4 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+                    placeholder="例如：一款简约风格的白色陶瓷咖啡杯，带金色把手，放在木质桌面上，旁边有咖啡豆，自然光，产品摄影，8K高清..."></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    选择模型
+                </label>
+                <select id="generateModelSelect" class="w-full p-2 border border-gray-200 rounded-lg bg-gray-50 text-sm">
+                    <option value="llava:7b">llava:7b (推荐)</option>
+                    <option value="bakllava:7b">bakllava:7b</option>
+                    <option value="moondream:latest">moondream:latest</option>
+                </select>
+                <p class="text-xs text-gray-400 mt-1">需要先通过 ollama pull 下载对应模型</p>
+            </div>
+            <div class="flex gap-3">
+                <button id="generatePromptBtn" class="flex-1 bg-pink-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-pink-700 transition flex justify-center items-center gap-2">
+                    <i class="fas fa-wand-magic"></i> 生成提示词
+                </button>
+                <button id="copyPromptBtn" class="px-4 bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl shadow-md hover:bg-gray-300 transition">
+                    <i class="far fa-copy"></i> 复制
+                </button>
+            </div>
+        </div>
+
+        <!-- 使用说明 -->
+        <div class="bg-blue-50 rounded-xl p-4 mt-4">
+            <h4 class="font-semibold text-blue-800 mb-2 flex items-center gap-1">
+                <i class="fas fa-info-circle"></i> 使用说明
+            </h4>
+            <ul class="text-sm text-blue-700 space-y-1">
+                <li>1. 输入你想要生成的图片描述</li>
+                <li>2. AI 会自动生成专业的文生图提示词（英文）</li>
+                <li>3. 复制提示词到 Stable Diffusion / Midjourney / DALL-E 使用</li>
+                <li>4. 提示词会自动保存到 generated_prompts 目录</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 右侧结果区 -->
+    <div class="lg:w-1/2">
+        <div class="bg-white rounded-2xl shadow-md p-6 sticky top-24">
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2">
+                <i class="fas fa-file-alt text-green-600"></i>
+                生成的提示词
+            </h3>
+            <div id="promptResultArea">
+                <div id="promptDefaultState" class="text-center text-gray-400 py-12">
+                    <i class="fas fa-magic text-5xl mb-3 opacity-40"></i>
+                    <p>等待生成提示词...</p>
+                </div>
+                <div id="promptLoadingState" class="hidden text-center text-pink-600 py-12">
+                    <div class="loader mx-auto mb-3"></div>
+                    <p>AI 正在生成提示词...</p>
+                </div>
+                <div id="promptResultContent" class="hidden">
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <pre id="generatedPromptText" class="whitespace-pre-wrap text-gray-700 font-mono text-sm"></pre>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="useInSDBtn" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition text-sm">
+                            <i class="fas fa-robot"></i> 复制到剪贴板
+                        </button>
+                        <button id="savePromptOnlyBtn" class="px-4 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition text-sm">
+                            <i class="fas fa-save"></i> 保存到文件
+                        </button>
+                    </div>
+                    <div class="mt-4 text-xs text-gray-400">
+                        <p>💡 生成的提示词可直接用于：</p>
+                        <div class="flex gap-2 mt-2">
+                            <span class="px-2 py-1 bg-gray-100 rounded">Stable Diffusion</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded">Midjourney</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded">DALL-E 3</span>
+                            <span class="px-2 py-1 bg-gray-100 rounded">ComfyUI</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function initTextToImage() {
+    const descriptionInput = document.getElementById('imageDescription');
+    const generateBtn = document.getElementById('generatePromptBtn');
+    const copyBtn = document.getElementById('copyPromptBtn');
+    const modelSelect = document.getElementById('generateModelSelect');
+    const defaultState = document.getElementById('promptDefaultState');
+    const loadingState = document.getElementById('promptLoadingState');
+    const resultContent = document.getElementById('promptResultContent');
+    const promptText = document.getElementById('generatedPromptText');
+    const useInSDBtn = document.getElementById('useInSDBtn');
+    const savePromptBtn = document.getElementById('savePromptOnlyBtn');
+
+    async function generatePrompt() {
+        const description = descriptionInput.value.trim();
+        if (!description) {
+            window.showToast('请输入图片描述');
+            return;
+        }
+
+        defaultState.classList.add('hidden');
+        loadingState.classList.remove('hidden');
+        resultContent.classList.add('hidden');
+
+        try {
+            const response = await fetch('/api/generate-prompt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    description: description,
+                    model: modelSelect.value
+                })
+            });
+            const data = await response.json();
+            loadingState.classList.add('hidden');
+            if (data.code === 0) {
+                promptText.innerText = data.data.prompt;
+                resultContent.classList.remove('hidden');
+                window.showToast('提示词生成成功！');
+            } else {
+                defaultState.classList.remove('hidden');
+                window.showToast('生成失败: ' + data.msg);
+            }
+        } catch (err) {
+            loadingState.classList.add('hidden');
+            defaultState.classList.remove('hidden');
+            window.showToast('请求错误: ' + err.message);
+        }
+    }
+
+    function copyToClipboard() {
+        const text = promptText.innerText;
+        if (text) {
+            navigator.clipboard.writeText(text).then(() => {
+                window.showToast('提示词已复制到剪贴板');
+            }).catch(() => {
+                window.showToast('复制失败');
+            });
+        }
+    }
+
+    function saveToFile() {
+        const text = promptText.innerText;
+        if (text) {
+            const blob = new Blob([text], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `prompt_${Date.now()}.txt`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            window.showToast('提示词已保存');
+        }
+    }
+
+    generateBtn.addEventListener('click', generatePrompt);
+    copyBtn.addEventListener('click', copyToClipboard);
+    if (useInSDBtn) useInSDBtn.addEventListener('click', copyToClipboard);
+    if (savePromptBtn) savePromptBtn.addEventListener('click', saveToFile);
+}
+
+// 确保全局函数存在
+window.initTextToImage = initTextToImage;
+</script>
